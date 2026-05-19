@@ -1,46 +1,25 @@
-server:
-  port: 8080
-  servlet:
-    context-path: /
+name: Java CI with Maven
 
-spring:
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-  application:
-    name: VotingApp
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-  datasource:
-    url: jdbc:mysql://localhost:3306/zinterview?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: Letmein@123
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    format_sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-logging:
-  level:
-    root: INFO
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    com.yourpackage: DEBUG
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info, metrics
-  endpoint:
-    health:
-      show-details: always
-
-app:
-  name: VotingApp
-  version: 1.0.0
-  description: "Spring Boot based Voting Application"
-  max-votes-per-user: 1
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
